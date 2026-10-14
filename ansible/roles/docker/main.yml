@@ -1,0 +1,14 @@
+---
+# Docker role tasks
+- name: Ensure Docker is installed (Debian/Ubuntu)
+  apt:
+    name: docker.io
+    state: present
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+
+- name: Ensure Docker service is running
+  service:
+    name: docker
+    state: started
+    enabled: yes

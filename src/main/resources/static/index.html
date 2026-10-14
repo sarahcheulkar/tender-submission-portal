@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TenderFlow — Ansible-Provisioned Tender Submission Portal | Sarah Cheulkar</title>
+    <!-- Modern Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Main Design System -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Ambient Background Lighting -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+
+    <div class="app-container">
+        <!-- ==================== LEFT SIDEBAR ==================== -->
+        <aside class="sidebar">
+            <div class="brand-wrapper">
+                <div class="brand-logo-cube">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                </div>
+                <div class="brand-info">
+                    <h1>TenderOps</h1>
+                    <span>Command Center</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#overview" class="nav-link active" onclick="switchNav(this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    Overview
+                </a>
+                <a href="#tenders-catalog" class="nav-link" onclick="switchNav(this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    Tenders Catalog
+                    <span class="nav-badge" id="badge-open-tenders">3</span>
+                </a>
+                <a href="#queue-section" class="nav-link" onclick="switchNav(this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                    Approval Queue
+                    <span class="nav-badge" id="badge-pending-reviews">2</span>
+                </a>
+                <a href="#submissions-section" class="nav-link" onclick="switchNav(this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                    Audit Ledger
+                </a>
+                <a href="javascript:void(0)" class="nav-link" onclick="openTelemetryModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg>
+                    DevOps & Telemetry
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="status-card">
+                    <div class="status-indicator">
+                        <div class="pulse-dot"></div>
+                        <span>Platform Status</span>
+                    </div>
+                    <div class="status-desc" id="platform-status-text">Spring Boot 3 · H2 DB Online</div>
+                </div>
+
+                <div class="student-tag-card">
+                    <div class="student-avatar">SC</div>
+                    <div class="student-details">
+                        <h4>Sarah Cheulkar</h4>
+                        <p>Roll: 23102C0060</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ==================== MAIN CONTENT WRAPPER ==================== -->
+        <main class="main-wrapper">
+            <!-- Top Header Bar -->
+            <header class="top-header">
+                <div class="search-bar-container">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="global-search" placeholder="Search tenders, submissions, applicants..." oninput="handleSearch(this.value)">
+                    <span class="search-shortcut">⌘K</span>
+                </div>
+
+                <div class="header-actions">
+                    <!-- Light / Dark Theme Toggle Switch -->
+                    <button class="btn-icon" id="theme-toggle-btn" title="Toggle Light / Dark Mode" onclick="toggleTheme()">
+                        <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg id="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+
+                    <!-- Primary Action Button -->
+                    <button class="btn-primary-gradient" id="new-bid-btn" onclick="openSubmissionModal()">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Submit Tender Bid
+                    </button>
+
+                    <!-- User Profile / Role Switcher -->
+                    <div class="user-profile-badge" onclick="openLoginModal()" title="Switch Account / Role">
+                        <div class="student-avatar" style="width:28px;height:28px;font-size:0.75rem;">SC</div>
+                        <div class="user-badge-text">
+                            <h4 id="current-user-name">Sarah Cheulkar</h4>
+                            <span id="current-user-role">ADMIN REVIEWER</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content Container -->
+            <div class="dashboard-content">
+                <!-- Banner Title Section -->
+                <section class="banner-section" id="overview">
+                    <div class="banner-text">
+                        <h2>Tender Workflow Command Center</h2>
+                        <p>Monitor procurement routing, quality gates, automated reviewer approvals, and submission health in real time.</p>
+                    </div>
+                    <button class="btn-primary-gradient" style="background: var(--bg-surface-elevated); border:1px solid var(--border-glow); box-shadow:none; color: var(--text-primary);" onclick="scrollToQueue()">
+                        Open Review Console →
+                    </button>
+                </section>
+
+                <!-- 4 KPI Stat Cards Row (Exact Match to Screenshot) -->
+                <section class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span>Procurement Spend</span>
+                            <div class="stat-icon-pill indigo">💲</div>
+                        </div>
+                        <div class="stat-value" id="stat-spend">$4,820,000</div>
+                        <div class="stat-trend">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                            <span>+14.2% vs last cycle</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span>Workflow Health</span>
+                            <div class="stat-icon-pill cyan">⚡</div>
+                        </div>
+                        <div class="stat-value" id="stat-health">99.4%</div>
+                        <div class="stat-trend">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                            <span>Actuator UP · CI Active</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span>Approval Rate</span>
+                            <div class="stat-icon-pill emerald">🛡️</div>
+                        </div>
+                        <div class="stat-value" id="stat-rate">75.0%</div>
+                        <div class="stat-trend">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                            <span>3 of 4 bids cleared</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span>Active Submissions</span>
+                            <div class="stat-icon-pill violet">👥</div>
+                        </div>
+                        <div class="stat-value" id="stat-subs">4 Total</div>
+                        <div class="stat-trend neutral">
+                            <span>2 Pending Evaluation</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Middle Section: Workflow Routing Map (2/3) + Approval Queue (1/3) -->
+                <section class="middle-grid">
+                    <!-- Workflow Routing Map -->
+                    <div class="workflow-card">
+                        <div class="card-title-bar">
+                            <h3>Workflow Routing & Lifecycle Map</h3>
+                            <div class="badge-live">
+                                <div class="pulse-dot"></div>
+                                Live Pipeline
+                            </div>
+                        </div>
+
+                        <!-- Interactive Flow Visual -->
+                        <div class="flowchart-canvas">
+                            <!-- Background Neon Flow Lines SVG -->
+                            <svg class="flow-svg-overlay" preserveAspectRatio="none" viewBox="0 0 600 160">
+                                <defs>
+                                    <linearGradient id="waveGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.8"/>
+                                        <stop offset="50%" stop-color="#3B82F6" stop-opacity="0.9"/>
+                                        <stop offset="100%" stop-color="#06B6D4" stop-opacity="0.95"/>
+                                    </linearGradient>
+                                    <linearGradient id="waveGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#EC4899" stop-opacity="0.5"/>
+                                        <stop offset="60%" stop-color="#8B5CF6" stop-opacity="0.7"/>
+                                        <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.9"/>
+                                    </linearGradient>
+                                </defs>
+                                <!-- Multi-path flow waves -->
+                                <path d="M 50 80 C 130 30, 170 30, 250 80 C 330 130, 390 130, 480 80 C 520 60, 540 80, 560 80" fill="none" stroke="url(#waveGrad1)" stroke-width="4" stroke-dasharray="8 4"/>
+                                <path d="M 50 80 C 120 120, 180 120, 250 80 C 320 40, 400 40, 480 80 C 510 95, 540 85, 560 80" fill="none" stroke="url(#waveGrad2)" stroke-width="3" stroke-dasharray="4 4"/>
+                                <path d="M 50 80 L 560 80" fill="none" stroke="rgba(99, 102, 241, 0.25)" stroke-width="2"/>
+                            </svg>
+
+                            <!-- Node 1: Intake -->
+                            <div class="flow-step-node" onclick="filterByNode(SUBMITTED)">
+                                <div class="node-ring active">📥</div>
+                                <span class="node-label">Intake</span>
+                                <span class="node-rate">100% (4)</span>
+                            </div>
+
+                            <!-- Node 2: Validate -->
+                            <div class="flow-step-node" onclick="filterByNode(SUBMITTED)">
+                                <div class="node-ring active">⚖️</div>
+                                <span class="node-label">Validate</span>
+                                <span class="node-rate">85% (3)</span>
+                            </div>
+
+                            <!-- Node 3: Review -->
+                            <div class="flow-step-node" onclick="filterByNode(UNDER_REVIEW)">
+                                <div class="node-ring active">🔍</div>
+                                <span class="node-label">Review</span>
+                                <span class="node-rate">72% (2)</span>
+                            </div>
+
+                            <!-- Node 4: Evaluation -->
+                            <div class="flow-step-node" onclick="filterByNode(REJECTED)">
+                                <div class="node-ring">🎯</div>
+                                <span class="node-label">Filter/Fall</span>
+                                <span class="node-rate">25% (1)</span>
+                            </div>
+
+                            <!-- Node 5: Awarded -->
+                            <div class="flow-step-node" onclick="filterByNode(APPROVED)">
+                                <div class="node-ring active">🏆</div>
+                                <span class="node-label">Awarded</span>
+                                <span class="node-rate">91% (1)</span>
+                            </div>
+                        </div>
+
+                        <div class="flow-legend">
+                            <div class="legend-item">
+                                <div class="legend-dot purple"></div>
+                                <span>Primary Path (68%)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-dot blue"></div>
+                                <span>Secondary Path (22%)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-dot emerald"></div>
+                                <span>Awarded Cleared (91%)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Approval Queue & Sparkline -->
+                    <div class="queue-card" id="queue-section">
+                        <div class="card-title-bar">
+                            <h3>Approval Queue</h3>
+                            <span class="search-shortcut" id="queue-count-badge">2 items</span>
+                        </div>
+
+                        <div class="queue-items-list" id="queue-items-container">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+
+                        <div class="cost-pulse-section">
+                            <div class="cost-header">
+                                <h4>Bid Value Pulse</h4>
+                                <span id="pulse-total-text">$3,075,000</span>
+                            </div>
+                            <!-- Mini Sparkline SVG -->
+                            <svg class="sparkline-svg" viewBox="0 0 300 60">
+                                <defs>
+                                    <linearGradient id="sparkGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#6366F1" stop-opacity="0.4"/>
+                                        <stop offset="100%" stop-color="#6366F1" stop-opacity="0"/>
+                                    </linearGradient>
+                                </defs>
+                                <path d="M 0 50 Q 50 15, 100 40 T 200 10 T 300 35 L 300 60 L 0 60 Z" fill="url(#sparkGrad)"/>
+                                <path d="M 0 50 Q 50 15, 100 40 T 200 10 T 300 35" fill="none" stroke="#818CF8" stroke-width="2.5"/>
+                            </svg>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Available Tenders Catalog -->
+                <section class="content-card" id="tenders-catalog">
+                    <div class="card-title-bar">
+                        <div>
+                            <h3>Published Tenders Catalog</h3>
+                            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Select an open government procurement project to submit your competitive bid.</p>
+                        </div>
+                    </div>
+                    <div class="stats-grid" id="tender-list" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                        <!-- Populated via JS -->
+                    </div>
+                </section>
+
+                <!-- Complete Submissions & Audit Ledger Table -->
+                <section class="content-card" id="submissions-section">
+                    <div class="table-toolbar">
+                        <div>
+                            <h3>Tender Submissions & Audit Ledger</h3>
+                            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Complete traceability records for academic evaluator and stakeholder review.</p>
+                        </div>
+
+                        <!-- Filter Pills -->
+                        <div class="filter-pills-row">
+                            <button class="filter-pill active" onclick="setFilter(ALL, this)">All (4)</button>
+                            <button class="filter-pill" onclick="setFilter(SUBMITTED, this)">Submitted</button>
+                            <button class="filter-pill" onclick="setFilter(UNDER_REVIEW, this)">Under Review</button>
+                            <button class="filter-pill" onclick="setFilter(APPROVED, this)">Approved</button>
+                            <button class="filter-pill" onclick="setFilter(REJECTED, this)">Rejected</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Tender Title & Reference</th>
+                                    <th>Applicant / Consortium</th>
+                                    <th>Bid Amount</th>
+                                    <th>Submitted Date</th>
+                                    <th>Status</th>
+                                    <th style="text-align: right;">Evaluation Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="submissions-table-body">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- ==================== NEW BID SUBMISSION MODAL ==================== -->
+    <div class="modal-overlay" id="submission-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Submit New Tender Application</h3>
+                <button class="btn-icon" onclick="closeSubmissionModal()">&times;</button>
+            </div>
+            <form id="submission-form" onsubmit="handleSubmissionSubmit(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Target Tender Project *</label>
+                        <select class="form-control" id="modal-tender-select" required>
+                            <option value="">Select an open tender...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Competitive Bid Amount (USD) *</label>
+                        <input type="number" step="1000" min="1" class="form-control" id="bid-amount" placeholder="e.g. 785000" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Technical Architecture & Proposal Overview *</label>
+                        <textarea class="form-control" id="technical-description" placeholder="Summarize your engineering methodology, SLA guarantees, and architecture..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Supporting Compliance Document Reference</label>
+                        <input type="text" class="form-control" id="document-ref" placeholder="e.g. TECH-SPEC-PROPOSAL-V1.pdf">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeSubmissionModal()">Cancel</button>
+                    <button type="submit" class="btn-primary-gradient" id="submit-button">Submit Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== REVIEW / DECISION MODAL ==================== -->
+    <div class="modal-overlay" id="review-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="review-modal-title">Review Submission Evaluation</h3>
+                <button class="btn-icon" onclick="closeReviewModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="background:var(--bg-surface); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                    <p style="font-size:0.75rem; color:var(--text-muted);">APPLICANT</p>
+                    <h4 id="review-modal-applicant" style="margin-bottom:6px;">Applicant Name</h4>
+                    <p style="font-size:0.75rem; color:var(--text-muted);">BID AMOUNT</p>
+                    <h3 id="review-modal-bid" style="color:var(--accent-cyan);">$0.00</h3>
+                </div>
+
+                <div class="form-group">
+                    <label>Evaluator Feedback / Rejection Justification</label>
+                    <textarea class="form-control" id="review-comments" placeholder="State compliance findings or rejection reason..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeReviewModal()">Cancel</button>
+                <button type="button" class="btn-action-sm reject" id="reject-button" onclick="executeReview(REJECTED)">Reject Submission</button>
+                <button type="button" class="btn-action-sm approve" id="approve-button" onclick="executeReview(APPROVED)">Approve & Award</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TELEMETRY MODAL ==================== -->
+    <div class="modal-overlay" id="telemetry-modal">
+        <div class="modal-card" style="max-width:680px;">
+            <div class="modal-header">
+                <h3>DevOps Infrastructure & Health Telemetry</h3>
+                <button class="btn-icon" onclick="closeTelemetryModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <pre id="telemetry-json" style="background:var(--bg-primary); padding:16px; border-radius:var(--radius-md); font-family:var(--font-mono); font-size:0.78rem; color:var(--accent-cyan); overflow-x:auto; max-height:360px;">Loading Actuator Telemetry...</pre>
+            </div>
+            <div class="modal-footer">
+                <a href="/actuator/health" target="_blank" class="btn-secondary" style="text-decoration:none;">Open /actuator/health</a>
+                <button type="button" class="btn-primary-gradient" onclick="closeTelemetryModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="app-toast">Notification Message</div>
+
+    <!-- Client Application JavaScript -->
+    <script src="js/app.js"></script>
+</body>
+</html>

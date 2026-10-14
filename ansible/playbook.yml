@@ -1,0 +1,43 @@
+---
+- name: "Provision and Deploy Tender Submission Portal (Sarah Cheulkar - 23102C0060)"
+  hosts: app_servers
+  gather_facts: yes
+
+  tasks:
+    - name: "Task 13.1: Verify Server Architecture and OS Prerequisites"
+      debug:
+        msg: "Provisioning node: {{ ansible_distribution | default('Unix/Darwin') }} (Arch: {{ ansible_architecture }})"
+
+    - name: "Task 13.2: Ensure application runtime directory exists"
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: "Task 13.3: Ensure application logs directory exists"
+      file:
+        path: "{{ app_dir }}/logs"
+        state: directory
+        mode: '0775'
+
+    - name: "Task 13.4: Deploy and verify Tender Portal Docker container"
+      command: >
+        docker run -d --name {{ docker_container }} -p {{ app_port }}:8082 {{ docker_image }}
+      register: docker_run_result
+      failed_when: false
+      changed_when: docker_run_result.rc == 0
+
+    - name: "Task 13.5: Query Application Health Endpoint"
+      uri:
+        url: "http://localhost:{{ app_port }}/api/health"
+        method: GET
+        status_code: 200
+        return_content: yes
+      register: health_check
+      until: health_check.status == 200
+      retries: 5
+      delay: 3
+
+    - name: "Task 13.6: Verify Health Status and Student Metadata"
+      debug:
+        msg: "Tender Portal is healthy: {{ health_check.json.service }} | Student: {{ health_check.json.student }}"

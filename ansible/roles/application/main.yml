@@ -1,0 +1,46 @@
+---
+# Application role tasks
+- name: Pull application images
+  docker_image:
+    name: "{{ item }}"
+    source: pull
+  loop:
+    - "{{ app_image }}-backend:{{ app_version }}"
+    - "{{ app_image }}-frontend:{{ app_version }}"
+
+- name: Stop existing application containers
+  docker_container:
+    name: "{{ item }}"
+    state: stopped
+  loop:
+    - tender-frontend
+    - tender-backend
+
+- name: Start backend container
+  docker_container:
+    name: tender-backend
+    image: "{{ app_image }}-backend:{{ app_version }}"
+    state: started
+    restart_policy: always
+    ports:
+      - "8081:8081"
+    env:
+      SPRING_DATASOURCE_URL: "jdbc:mysql://db:3306/tender_portal?useSSL=false&serverTimezone=UTC"
+
+- name: Start frontend container
+  docker_container:
+    name: tender-frontend
+    image: "{{ app_image }}-frontend:{{ app_version }}"
+    state: started
+    restart_policy: always
+    ports:
+      - "80:80"
+
+- name: Check application health
+  uri:
+    url: "http://localhost:8081/api/health"
+    return_content: yes
+  register: health_result
+  until: health_result.status == 200
+  retries: 5
+  delay: 10

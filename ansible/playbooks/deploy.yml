@@ -1,0 +1,13 @@
+---
+- name: Deploy Tender Submission Portal
+  hosts: webservers
+  become: yes
+  vars:
+    # Use actual credentials/variables in CI/CD pipeline or vault
+    docker_registry: "registry.example.com"
+    app_image: "{{ docker_registry }}/tender-portal"
+    app_version: "latest"
+  
+  roles:
+    - docker
+    - application

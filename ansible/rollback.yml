@@ -1,0 +1,36 @@
+---
+- name: "Automated Rollback and Recovery Playbook (Task 14)"
+  hosts: app_servers
+  gather_facts: no
+
+  tasks:
+    - name: "Step 1: Check container health"
+      command: docker inspect --format="{{ '{{' }} .State.Health.Status {{ '}}' }}" {{ docker_container }}
+      register: container_health
+      failed_when: false
+
+    - name: "Step 2: Stop and remove broken container"
+      command: docker stop {{ docker_container }}
+      failed_when: false
+
+    - name: "Step 3: Remove container"
+      command: docker rm -f {{ docker_container }}
+      failed_when: false
+
+    - name: "Step 4: Rollback to previous known-good stable release"
+      command: >
+        docker run -d --name {{ docker_container }} -p {{ app_port }}:8082 sarahcheulkar/tender-portal:latest
+      register: rollback_result
+
+    - name: "Step 5: Verify recovered service health"
+      uri:
+        url: "http://localhost:{{ app_port }}/actuator/health"
+        status_code: 200
+      register: recovered_health
+      until: recovered_health.status == 200
+      retries: 5
+      delay: 3
+
+    - name: "Step 6: Report rollback success"
+      debug:
+        msg: "Successfully restored Tender Portal container service to healthy state on port {{ app_port }}."
