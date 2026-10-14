@@ -97,7 +97,7 @@ pipeline {
                 echo "==> Performing Health Check on deployed container..."
                 sh """
                     sleep 5
-                    curl -f http://localhost:${APP_PORT}/actuator/health || (echo "Health check failed!" && exit 1)
+                    curl -f http://host.docker.internal:${APP_PORT}/actuator/health || curl -f http://localhost:${APP_PORT}/actuator/health || (echo "Health check failed!" && exit 1)
                 """
             }
         }
