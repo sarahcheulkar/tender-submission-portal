@@ -51,7 +51,24 @@ public class SubmissionController {
 
     @PostMapping
     public ResponseEntity<?> createSubmission(@Valid @RequestBody SubmissionRequest req) {
-        User user = getCurrentOrFallbackUser();
+        User user = null;
+        if (req.getApplicantEmail() != null && !req.getApplicantEmail().trim().isEmpty()) {
+            String email = req.getApplicantEmail().trim();
+            user = userRepository.findByEmail(email).orElseGet(() -> {
+                User u = new User();
+                u.setEmail(email);
+                u.setName(req.getApplicantName() != null && !req.getApplicantName().trim().isEmpty() ? 
+                        req.getApplicantName().trim() : "Applicant");
+                u.setOrganization(req.getOrganization() != null && !req.getOrganization().trim().isEmpty() ? 
+                        req.getOrganization().trim() : "Enterprise Vendor");
+                u.setRole(User.Role.APPLICANT);
+                u.setPassword("password");
+                return userRepository.save(u);
+            });
+        }
+        if (user == null) {
+            user = getCurrentOrFallbackUser();
+        }
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Valid applicant profile required."));

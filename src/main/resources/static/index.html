@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TenderFlow — Ansible-Provisioned Tender Submission Portal | Sarah Cheulkar</title>
+    <title>TenderOps — Enterprise Tender Submission & Evaluator Portal | Sarah Cheulkar</title>
     <!-- Modern Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <!-- Ambient Background Lighting -->
+    <!-- Ambient Background Meshes -->
     <div class="ambient-glow glow-1"></div>
     <div class="ambient-glow glow-2"></div>
     <div class="ambient-glow glow-3"></div>
@@ -30,30 +30,30 @@
                 </div>
                 <div class="brand-info">
                     <h1>TenderOps</h1>
-                    <span>Command Center</span>
+                    <span>Enterprise SaaS Portal</span>
                 </div>
             </div>
 
             <nav class="sidebar-nav">
-                <a href="#overview" class="nav-link active" onclick="switchNav(this)">
+                <a href="javascript:void(0)" class="nav-link active" data-view="overview" onclick="switchView('overview', this)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                     Overview
                 </a>
-                <a href="#tenders-catalog" class="nav-link" onclick="switchNav(this)">
+                <a href="javascript:void(0)" class="nav-link" data-view="tenders" onclick="switchView('tenders', this)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     Tenders Catalog
                     <span class="nav-badge" id="badge-open-tenders">3</span>
                 </a>
-                <a href="#queue-section" class="nav-link" onclick="switchNav(this)">
+                <a href="javascript:void(0)" class="nav-link" data-view="queue" onclick="switchView('queue', this)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
-                    Approval Queue
+                    Reviewer Console
                     <span class="nav-badge" id="badge-pending-reviews">2</span>
                 </a>
-                <a href="#submissions-section" class="nav-link" onclick="switchNav(this)">
+                <a href="javascript:void(0)" class="nav-link" data-view="submissions" onclick="switchView('submissions', this)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
                     Audit Ledger
                 </a>
-                <a href="javascript:void(0)" class="nav-link" onclick="openTelemetryModal()">
+                <a href="javascript:void(0)" class="nav-link" data-view="telemetry" onclick="switchView('telemetry', this)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg>
                     DevOps & Telemetry
                 </a>
@@ -84,7 +84,7 @@
             <header class="top-header">
                 <div class="search-bar-container">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" id="global-search" placeholder="Search tenders, submissions, applicants..." oninput="handleSearch(this.value)">
+                    <input type="text" id="global-search" placeholder="Search tenders, bids, applicants..." oninput="handleSearch(this.value)">
                     <span class="search-shortcut">⌘K</span>
                 </div>
 
@@ -95,14 +95,19 @@
                         <svg id="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                     </button>
 
+                    <!-- Publish New Tender Button -->
+                    <button class="btn-secondary" style="font-weight:600; font-size:0.85rem;" onclick="openCreateTenderModal()">
+                        + New Tender
+                    </button>
+
                     <!-- Primary Action Button -->
                     <button class="btn-primary-gradient" id="new-bid-btn" onclick="openSubmissionModal()">
                         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         Submit Tender Bid
                     </button>
 
-                    <!-- User Profile / Role Switcher -->
-                    <div class="user-profile-badge" onclick="openLoginModal()" title="Switch Account / Role">
+                    <!-- User Profile Badge -->
+                    <div class="user-profile-badge" title="Active Evaluator Session">
                         <div class="student-avatar" style="width:28px;height:28px;font-size:0.75rem;">SC</div>
                         <div class="user-badge-text">
                             <h4 id="current-user-name">Sarah Cheulkar</h4>
@@ -112,42 +117,47 @@
                 </div>
             </header>
 
-            <!-- Dashboard Content Container -->
-            <div class="dashboard-content">
+            <!-- ==================== VIEW 1: OVERVIEW DASHBOARD ==================== -->
+            <div class="view-panel active" id="view-overview">
                 <!-- Banner Title Section -->
-                <section class="banner-section" id="overview">
+                <section class="banner-section">
                     <div class="banner-text">
                         <h2>Tender Workflow Command Center</h2>
-                        <p>Monitor procurement routing, quality gates, automated reviewer approvals, and submission health in real time.</p>
+                        <p>Enterprise procurement routing, automated compliance gates, reviewer approval engine, and real-time ledger.</p>
                     </div>
-                    <button class="btn-primary-gradient" style="background: var(--bg-surface-elevated); border:1px solid var(--border-glow); box-shadow:none; color: var(--text-primary);" onclick="scrollToQueue()">
-                        Open Review Console →
-                    </button>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn-secondary" onclick="switchView('tenders')">
+                            Browse Catalog →
+                        </button>
+                        <button class="btn-primary-gradient" onclick="switchView('queue')">
+                            Open Review Console →
+                        </button>
+                    </div>
                 </section>
 
-                <!-- 4 KPI Stat Cards Row (Exact Match to Screenshot) -->
+                <!-- 4 KPI Stat Cards Row -->
                 <section class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-card-header">
-                            <span>Procurement Spend</span>
+                            <span>Procurement Pipeline Value</span>
                             <div class="stat-icon-pill indigo">💲</div>
                         </div>
                         <div class="stat-value" id="stat-spend">$4,820,000</div>
                         <div class="stat-trend">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-                            <span>+14.2% vs last cycle</span>
+                            <span>+14.2% budget allocation</span>
                         </div>
                     </div>
 
                     <div class="stat-card">
                         <div class="stat-card-header">
-                            <span>Workflow Health</span>
+                            <span>System Reliability</span>
                             <div class="stat-icon-pill cyan">⚡</div>
                         </div>
                         <div class="stat-value" id="stat-health">99.4%</div>
                         <div class="stat-trend">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-                            <span>Actuator UP · CI Active</span>
+                            <span>Actuator UP · Jenkins Green</span>
                         </div>
                     </div>
 
@@ -159,7 +169,7 @@
                         <div class="stat-value" id="stat-rate">75.0%</div>
                         <div class="stat-trend">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-                            <span>3 of 4 bids cleared</span>
+                            <span>3 of 4 proposals cleared</span>
                         </div>
                     </div>
 
@@ -175,21 +185,20 @@
                     </div>
                 </section>
 
-                <!-- Middle Section: Workflow Routing Map (2/3) + Approval Queue (1/3) -->
+                <!-- Middle Section: Workflow Routing Map (2/3) + Overview Approval Queue (1/3) -->
                 <section class="middle-grid">
                     <!-- Workflow Routing Map -->
                     <div class="workflow-card">
                         <div class="card-title-bar">
-                            <h3>Workflow Routing & Lifecycle Map</h3>
+                            <h3>Workflow Routing & Lifecycle Pipeline</h3>
                             <div class="badge-live">
                                 <div class="pulse-dot"></div>
-                                Live Pipeline
+                                Live Engine
                             </div>
                         </div>
 
                         <!-- Interactive Flow Visual -->
                         <div class="flowchart-canvas">
-                            <!-- Background Neon Flow Lines SVG -->
                             <svg class="flow-svg-overlay" preserveAspectRatio="none" viewBox="0 0 600 160">
                                 <defs>
                                     <linearGradient id="waveGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -203,42 +212,41 @@
                                         <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.9"/>
                                     </linearGradient>
                                 </defs>
-                                <!-- Multi-path flow waves -->
                                 <path d="M 50 80 C 130 30, 170 30, 250 80 C 330 130, 390 130, 480 80 C 520 60, 540 80, 560 80" fill="none" stroke="url(#waveGrad1)" stroke-width="4" stroke-dasharray="8 4"/>
                                 <path d="M 50 80 C 120 120, 180 120, 250 80 C 320 40, 400 40, 480 80 C 510 95, 540 85, 560 80" fill="none" stroke="url(#waveGrad2)" stroke-width="3" stroke-dasharray="4 4"/>
                                 <path d="M 50 80 L 560 80" fill="none" stroke="rgba(99, 102, 241, 0.25)" stroke-width="2"/>
                             </svg>
 
                             <!-- Node 1: Intake -->
-                            <div class="flow-step-node" onclick="filterByNode(SUBMITTED)">
+                            <div class="flow-step-node" onclick="filterByNode('SUBMITTED')">
                                 <div class="node-ring active">📥</div>
                                 <span class="node-label">Intake</span>
                                 <span class="node-rate">100% (4)</span>
                             </div>
 
                             <!-- Node 2: Validate -->
-                            <div class="flow-step-node" onclick="filterByNode(SUBMITTED)">
+                            <div class="flow-step-node" onclick="filterByNode('SUBMITTED')">
                                 <div class="node-ring active">⚖️</div>
                                 <span class="node-label">Validate</span>
                                 <span class="node-rate">85% (3)</span>
                             </div>
 
                             <!-- Node 3: Review -->
-                            <div class="flow-step-node" onclick="filterByNode(UNDER_REVIEW)">
+                            <div class="flow-step-node" onclick="filterByNode('UNDER_REVIEW')">
                                 <div class="node-ring active">🔍</div>
                                 <span class="node-label">Review</span>
                                 <span class="node-rate">72% (2)</span>
                             </div>
 
                             <!-- Node 4: Evaluation -->
-                            <div class="flow-step-node" onclick="filterByNode(REJECTED)">
+                            <div class="flow-step-node" onclick="filterByNode('REJECTED')">
                                 <div class="node-ring">🎯</div>
                                 <span class="node-label">Filter/Fall</span>
                                 <span class="node-rate">25% (1)</span>
                             </div>
 
                             <!-- Node 5: Awarded -->
-                            <div class="flow-step-node" onclick="filterByNode(APPROVED)">
+                            <div class="flow-step-node" onclick="filterByNode('APPROVED')">
                                 <div class="node-ring active">🏆</div>
                                 <span class="node-label">Awarded</span>
                                 <span class="node-rate">91% (1)</span>
@@ -248,24 +256,24 @@
                         <div class="flow-legend">
                             <div class="legend-item">
                                 <div class="legend-dot purple"></div>
-                                <span>Primary Path (68%)</span>
+                                <span>Primary Routing (68%)</span>
                             </div>
                             <div class="legend-item">
                                 <div class="legend-dot blue"></div>
-                                <span>Secondary Path (22%)</span>
+                                <span>Secondary Review (22%)</span>
                             </div>
                             <div class="legend-item">
                                 <div class="legend-dot emerald"></div>
-                                <span>Awarded Cleared (91%)</span>
+                                <span>Contract Awarded (91%)</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Right Column: Approval Queue & Sparkline -->
-                    <div class="queue-card" id="queue-section">
+                    <!-- Right Column: Approval Queue Quick Widget -->
+                    <div class="queue-card">
                         <div class="card-title-bar">
-                            <h3>Approval Queue</h3>
-                            <span class="search-shortcut" id="queue-count-badge">2 items</span>
+                            <h3>Pending Evaluations</h3>
+                            <button class="btn-action-sm" style="font-size:0.75rem;" onclick="switchView('queue')">View All →</button>
                         </div>
 
                         <div class="queue-items-list" id="queue-items-container">
@@ -277,7 +285,6 @@
                                 <h4>Bid Value Pulse</h4>
                                 <span id="pulse-total-text">$3,075,000</span>
                             </div>
-                            <!-- Mini Sparkline SVG -->
                             <svg class="sparkline-svg" viewBox="0 0 300 60">
                                 <defs>
                                     <linearGradient id="sparkGrad" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -292,34 +299,109 @@
                     </div>
                 </section>
 
-                <!-- Available Tenders Catalog -->
-                <section class="content-card" id="tenders-catalog">
-                    <div class="card-title-bar">
-                        <div>
-                            <h3>Published Tenders Catalog</h3>
-                            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Select an open government procurement project to submit your competitive bid.</p>
+                <!-- Lower Section: Open Tenders Preview + Recent Submissions -->
+                <section class="middle-grid" style="margin-top:20px;">
+                    <div class="content-card">
+                        <div class="card-title-bar">
+                            <h3>Featured Government Tenders</h3>
+                            <button class="btn-action-sm" onclick="switchView('tenders')">Catalog (All) →</button>
+                        </div>
+                        <div class="stats-grid" id="overview-tender-list" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:14px;">
+                            <!-- Populated via JS -->
                         </div>
                     </div>
-                    <div class="stats-grid" id="tender-list" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
-                        <!-- Populated via JS -->
+
+                    <div class="content-card">
+                        <div class="card-title-bar">
+                            <h3>Recent Ledger Activity</h3>
+                            <button class="btn-action-sm" onclick="switchView('submissions')">Full Ledger →</button>
+                        </div>
+                        <div id="overview-recent-submissions">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ==================== VIEW 2: TENDERS CATALOG ==================== -->
+            <div class="view-panel" id="view-tenders">
+                <section class="banner-section" style="margin-bottom:20px;">
+                    <div class="banner-text">
+                        <h2>Government Procurement Tenders</h2>
+                        <p>Explore authorized government infrastructure projects, download technical specifications, and submit bids.</p>
+                    </div>
+                    <button class="btn-primary-gradient" onclick="openCreateTenderModal()">
+                        + Publish New Tender Project
+                    </button>
+                </section>
+
+                <!-- Filter Row -->
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
+                    <!-- Categories -->
+                    <div class="filter-pills-row">
+                        <button class="filter-pill tender-cat-pill active" onclick="filterTendersByCategory('ALL', this)">All Categories</button>
+                        <button class="filter-pill tender-cat-pill" onclick="filterTendersByCategory('Smart Transit', this)">Smart Transit</button>
+                        <button class="filter-pill tender-cat-pill" onclick="filterTendersByCategory('Telecommunications', this)">Telecom</button>
+                        <button class="filter-pill tender-cat-pill" onclick="filterTendersByCategory('Information Security', this)">Security</button>
+                        <button class="filter-pill tender-cat-pill" onclick="filterTendersByCategory('Energy & Utilities', this)">Energy</button>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="filter-pills-row">
+                        <button class="filter-pill tender-status-pill active" onclick="filterTendersByStatus('ALL', this)">All Status</button>
+                        <button class="filter-pill tender-status-pill" onclick="filterTendersByStatus('OPEN', this)">Open Only</button>
+                        <button class="filter-pill tender-status-pill" onclick="filterTendersByStatus('CLOSED', this)">Closed</button>
+                    </div>
+                </div>
+
+                <!-- Complete Tenders Grid -->
+                <div class="stats-grid" id="tender-list" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap:18px;">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- ==================== VIEW 3: REVIEWER CONSOLE ==================== -->
+            <div class="view-panel" id="view-queue">
+                <section class="banner-section" style="margin-bottom:20px;">
+                    <div class="banner-text">
+                        <h2>Evaluator Review Console & Decision Engine</h2>
+                        <p>Perform technical compliance verifications, inspect proposals, and grant contract awards or record rejections.</p>
+                    </div>
+                    <div class="badge-live" style="padding:8px 16px; font-size:0.85rem;">
+                        <div class="pulse-dot"></div>
+                        Evaluator Role: Sarah Cheulkar
                     </div>
                 </section>
 
-                <!-- Complete Submissions & Audit Ledger Table -->
-                <section class="content-card" id="submissions-section">
+                <div id="queue-page-list">
+                    <!-- Populated via JS with rich proposal review cards -->
+                </div>
+            </div>
+
+            <!-- ==================== VIEW 4: SUBMISSIONS & AUDIT LEDGER ==================== -->
+            <div class="view-panel" id="view-submissions">
+                <section class="content-card">
                     <div class="table-toolbar">
                         <div>
-                            <h3>Tender Submissions & Audit Ledger</h3>
-                            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Complete traceability records for academic evaluator and stakeholder review.</p>
+                            <h2>Tender Submissions & Immutable Audit Ledger</h2>
+                            <p style="font-size:0.85rem; color:var(--text-muted); margin-top:3px;">
+                                Timestamped bid records, evaluator decisions, and compliance justifications.
+                            </p>
                         </div>
 
-                        <!-- Filter Pills -->
-                        <div class="filter-pills-row">
-                            <button class="filter-pill active" onclick="setFilter(ALL, this)">All (4)</button>
-                            <button class="filter-pill" onclick="setFilter(SUBMITTED, this)">Submitted</button>
-                            <button class="filter-pill" onclick="setFilter(UNDER_REVIEW, this)">Under Review</button>
-                            <button class="filter-pill" onclick="setFilter(APPROVED, this)">Approved</button>
-                            <button class="filter-pill" onclick="setFilter(REJECTED, this)">Rejected</button>
+                        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                            <!-- Filter Pills -->
+                            <div class="filter-pills-row">
+                                <button class="filter-pill active" onclick="setFilter('ALL', this)">All</button>
+                                <button class="filter-pill" onclick="setFilter('SUBMITTED', this)">Submitted</button>
+                                <button class="filter-pill" onclick="setFilter('UNDER_REVIEW', this)">Under Review</button>
+                                <button class="filter-pill" onclick="setFilter('APPROVED', this)">Approved</button>
+                                <button class="filter-pill" onclick="setFilter('REJECTED', this)">Rejected</button>
+                            </div>
+
+                            <button class="btn-primary-gradient" onclick="openSubmissionModal()">
+                                + Submit Bid
+                            </button>
                         </div>
                     </div>
 
@@ -327,13 +409,13 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Code</th>
-                                    <th>Tender Title & Reference</th>
+                                    <th>Tracking Code</th>
+                                    <th>Tender Reference & Title</th>
                                     <th>Applicant / Consortium</th>
                                     <th>Bid Amount</th>
                                     <th>Submitted Date</th>
-                                    <th>Status</th>
-                                    <th style="text-align: right;">Evaluation Action</th>
+                                    <th>Current Status</th>
+                                    <th style="text-align: right;">Evaluator Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="submissions-table-body">
@@ -343,14 +425,89 @@
                     </div>
                 </section>
             </div>
+
+            <!-- ==================== VIEW 5: DEVOPS & TELEMETRY ==================== -->
+            <div class="view-panel" id="view-telemetry">
+                <section class="banner-section" style="margin-bottom:20px;">
+                    <div class="banner-text">
+                        <h2>DevOps Infrastructure & Reliability Telemetry</h2>
+                        <p>Continuous monitoring of Spring Boot Actuator, Docker container runtime, Jenkins CI/CD pipeline, and Ansible automation.</p>
+                    </div>
+                    <button class="btn-secondary" onclick="renderTelemetry()">
+                        🔄 Refresh Telemetry
+                    </button>
+                </section>
+
+                <div class="stats-grid" style="margin-bottom:20px;">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span>Spring Boot Actuator</span>
+                            <div class="stat-icon-pill emerald">✓</div>
+                        </div>
+                        <div class="stat-value" style="color:var(--accent-emerald);">UP</div>
+                        <div class="stat-trend">
+                            <span>Embedded H2 Database · Port 8082</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span>Jenkins CI/CD Pipeline</span>
+                            <div class="stat-icon-pill cyan">⚙️</div>
+                        </div>
+                        <div class="stat-value" style="color:var(--accent-cyan);">Build #4</div>
+                        <div class="stat-trend">
+                            <span>10 Stages Passed · Quality Gate Clear</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span>Docker Container</span>
+                            <div class="stat-icon-pill violet">🐳</div>
+                        </div>
+                        <div class="stat-value" style="font-size:1.1rem; color:var(--text-primary);">tender-portal</div>
+                        <div class="stat-trend">
+                            <span>Multi-Stage JRE 17 · Port 8082:8082</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span>Ansible Automation</span>
+                            <div class="stat-icon-pill indigo">📜</div>
+                        </div>
+                        <div class="stat-value" style="color:var(--accent-primary);">Idempotent</div>
+                        <div class="stat-trend">
+                            <span>playbook.yml (changed=0) · Rollback Verified</span>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="content-card">
+                    <div class="card-title-bar">
+                        <div>
+                            <h3>Live Actuator & Service Telemetry Payload</h3>
+                            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Real-time JSON response from /actuator/health and REST metrics engine.</p>
+                        </div>
+                        <button class="btn-secondary" onclick="copyTelemetryJson()">
+                            📋 Copy JSON
+                        </button>
+                    </div>
+                    <pre id="telemetry-json-full" style="background:var(--bg-primary); padding:18px; border-radius:var(--radius-md); font-family:var(--font-mono); font-size:0.82rem; color:var(--accent-cyan); overflow-x:auto; max-height:420px; line-height:1.5;">Loading Actuator Telemetry...</pre>
+                </section>
+            </div>
         </main>
     </div>
 
     <!-- ==================== NEW BID SUBMISSION MODAL ==================== -->
     <div class="modal-overlay" id="submission-modal">
-        <div class="modal-card">
+        <div class="modal-card" style="max-width:640px;">
             <div class="modal-header">
-                <h3>Submit New Tender Application</h3>
+                <div>
+                    <h3>Submit Competitive Tender Bid</h3>
+                    <p style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">Fill in proposal parameters. Bid amount will be validated against estimated ceiling.</p>
+                </div>
                 <button class="btn-icon" onclick="closeSubmissionModal()">&times;</button>
             </div>
             <form id="submission-form" onsubmit="handleSubmissionSubmit(event)">
@@ -362,19 +519,36 @@
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label>Competitive Bid Amount (USD) *</label>
-                        <input type="number" step="1000" min="1" class="form-control" id="bid-amount" placeholder="e.g. 785000" required>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <div class="form-group">
+                            <label>Applicant Contact Name *</label>
+                            <input type="text" class="form-control" id="applicant-name" placeholder="e.g. Sarah Cheulkar" value="Sarah Cheulkar" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Company / Organization Name *</label>
+                            <input type="text" class="form-control" id="applicant-org" placeholder="e.g. Cheulkar Global Infra" value="Cheulkar Infrastructure Ltd" required>
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <div class="form-group">
+                            <label>Corporate Email *</label>
+                            <input type="email" class="form-control" id="applicant-email" placeholder="e.g. sarah@cheulkar.com" value="sarah@cheulkar.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Competitive Bid Amount (USD) *</label>
+                            <input type="number" step="1000" min="1" class="form-control" id="bid-amount" placeholder="e.g. 785000" required>
+                        </div>
                     </div>
 
                     <div class="form-group">
-                        <label>Technical Architecture & Proposal Overview *</label>
-                        <textarea class="form-control" id="technical-description" placeholder="Summarize your engineering methodology, SLA guarantees, and architecture..." required></textarea>
+                        <label>Technical Architecture & Implementation Methodology *</label>
+                        <textarea class="form-control" id="technical-description" rows="3" placeholder="Provide architectural approach, SLA commitments, hardware delivery milestones..." required></textarea>
                     </div>
 
                     <div class="form-group">
                         <label>Supporting Compliance Document Reference</label>
-                        <input type="text" class="form-control" id="document-ref" placeholder="e.g. TECH-SPEC-PROPOSAL-V1.pdf">
+                        <input type="text" class="form-control" id="document-ref" placeholder="e.g. TECH-SPEC-V1.pdf" value="COMPLIANCE-DOC-2026.pdf">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -385,47 +559,114 @@
         </div>
     </div>
 
+    <!-- ==================== PUBLISH NEW TENDER MODAL ==================== -->
+    <div class="modal-overlay" id="create-tender-modal">
+        <div class="modal-card" style="max-width:600px;">
+            <div class="modal-header">
+                <div>
+                    <h3>Publish New Government Tender</h3>
+                    <p style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">Add a new procurement project to the public catalog.</p>
+                </div>
+                <button class="btn-icon" onclick="closeCreateTenderModal()">&times;</button>
+            </div>
+            <form id="create-tender-form" onsubmit="handleCreateTenderSubmit(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Project Title *</label>
+                        <input type="text" class="form-control" id="new-tender-title" placeholder="e.g. Regional Automated Rail Signaling System" required>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <div class="form-group">
+                            <label>Government Department / Agency *</label>
+                            <input type="text" class="form-control" id="new-tender-dept" placeholder="e.g. Rail Transportation Board" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Category *</label>
+                            <select class="form-control" id="new-tender-cat" required>
+                                <option value="Smart Transit">Smart Transit</option>
+                                <option value="Telecommunications">Telecommunications</option>
+                                <option value="Information Security">Information Security</option>
+                                <option value="Energy & Utilities">Energy & Utilities</option>
+                                <option value="Civil Infrastructure">Civil Infrastructure</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Estimated Value Ceiling (USD) *</label>
+                        <input type="number" step="5000" min="10000" class="form-control" id="new-tender-value" placeholder="e.g. 1500000" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Technical Specifications & Scope Overview *</label>
+                        <textarea class="form-control" id="new-tender-desc" rows="3" placeholder="Define mandatory SLA guidelines, architecture specs, delivery deadlines..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeCreateTenderModal()">Cancel</button>
+                    <button type="submit" class="btn-primary-gradient">Publish Tender</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- ==================== REVIEW / DECISION MODAL ==================== -->
     <div class="modal-overlay" id="review-modal">
-        <div class="modal-card">
+        <div class="modal-card" style="max-width:540px;">
             <div class="modal-header">
-                <h3 id="review-modal-title">Review Submission Evaluation</h3>
+                <div>
+                    <h3 id="review-modal-title">Evaluator Decision Engine</h3>
+                    <p style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">Approve proposal or reject with mandatory justification.</p>
+                </div>
                 <button class="btn-icon" onclick="closeReviewModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <div style="background:var(--bg-surface); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
-                    <p style="font-size:0.75rem; color:var(--text-muted);">APPLICANT</p>
-                    <h4 id="review-modal-applicant" style="margin-bottom:6px;">Applicant Name</h4>
-                    <p style="font-size:0.75rem; color:var(--text-muted);">BID AMOUNT</p>
-                    <h3 id="review-modal-bid" style="color:var(--accent-cyan);">$0.00</h3>
+                <div style="background:var(--bg-surface); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); margin-bottom:14px;">
+                    <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase;">Target Tender Project</div>
+                    <div id="review-modal-tender" style="font-weight:700; color:var(--text-primary); font-size:0.95rem; margin-bottom:8px;">Tender Title</div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <div>
+                            <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase;">Applicant</div>
+                            <div id="review-modal-applicant" style="font-weight:700; color:var(--text-primary); font-size:0.9rem;">Applicant Name</div>
+                        </div>
+                        <div>
+                            <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase;">Proposed Bid</div>
+                            <div id="review-modal-bid" style="font-size:1.15rem; font-weight:800; color:var(--accent-cyan); font-family:var(--font-mono);">$0.00</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label>Evaluator Feedback / Rejection Justification</label>
-                    <textarea class="form-control" id="review-comments" placeholder="State compliance findings or rejection reason..."></textarea>
+                    <textarea class="form-control" id="review-comments" rows="3" placeholder="State compliance findings, SLA evaluation, or rejection reason..."></textarea>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-secondary" onclick="closeReviewModal()">Cancel</button>
-                <button type="button" class="btn-action-sm reject" id="reject-button" onclick="executeReview(REJECTED)">Reject Submission</button>
-                <button type="button" class="btn-action-sm approve" id="approve-button" onclick="executeReview(APPROVED)">Approve & Award</button>
+                <button type="button" class="btn-action-sm reject" id="reject-button" style="padding:10px 18px; font-weight:700;" onclick="executeReview('REJECTED')">
+                    ✗ Reject Submission
+                </button>
+                <button type="button" class="btn-action-sm approve" id="approve-button" style="padding:10px 20px; font-weight:700;" onclick="executeReview('APPROVED')">
+                    ✓ Approve & Award
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- ==================== TELEMETRY MODAL ==================== -->
-    <div class="modal-overlay" id="telemetry-modal">
+    <!-- ==================== DETAILS INSPECTION MODAL ==================== -->
+    <div class="modal-overlay" id="details-modal">
         <div class="modal-card" style="max-width:680px;">
             <div class="modal-header">
-                <h3>DevOps Infrastructure & Health Telemetry</h3>
-                <button class="btn-icon" onclick="closeTelemetryModal()">&times;</button>
+                <div>
+                    <h3>Tender Submission Inspection & Audit Details</h3>
+                    <p style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">Complete immutable submission record and compliance trail.</p>
+                </div>
+                <button class="btn-icon" onclick="closeDetailsModal()">&times;</button>
             </div>
-            <div class="modal-body">
-                <pre id="telemetry-json" style="background:var(--bg-primary); padding:16px; border-radius:var(--radius-md); font-family:var(--font-mono); font-size:0.78rem; color:var(--accent-cyan); overflow-x:auto; max-height:360px;">Loading Actuator Telemetry...</pre>
-            </div>
-            <div class="modal-footer">
-                <a href="/actuator/health" target="_blank" class="btn-secondary" style="text-decoration:none;">Open /actuator/health</a>
-                <button type="button" class="btn-primary-gradient" onclick="closeTelemetryModal()">Close</button>
+            <div class="modal-body" id="details-modal-content">
+                <!-- Dynamically filled -->
             </div>
         </div>
     </div>
