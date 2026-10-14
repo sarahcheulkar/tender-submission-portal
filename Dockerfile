@@ -5,17 +5,17 @@
 # ==============================================================================
 
 # Build Stage
-FROM maven:3.9.6-eclipse-temurin-17-alpine AS builder
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
 WORKDIR /build
 
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
+RUN mvn dependency:go-offline -B || true
 
 COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Runtime Stage
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 
 LABEL maintainer="Sarah Cheulkar <23102C0060@student.edu>"
@@ -25,8 +25,8 @@ LABEL subject="DevOps Major Project"
 LABEL version="1.0.0"
 
 # Install curl for Docker & Ansible healthchecks
-RUN apk add --no-cache curl tzdata && \
-    addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/* && \
+    groupadd -r appgroup && useradd -r -g appgroup -s /bin/false appuser
 
 COPY --from=builder /build/target/tender-submission-portal-1.0.0.jar app.jar
 RUN chown -R appuser:appgroup /app
